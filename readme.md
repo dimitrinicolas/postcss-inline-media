@@ -1,6 +1,6 @@
 # PostCSS Inline Media Queries
 
-It is a [PostCSS][PostCSS] plugin that allow writing media queries properties on the same line.
+It is a [PostCSS](https://github.com/postcss/postcss) plugin that allow writing media queries properties on the same line.
 
 ## Installation
 
@@ -15,7 +15,7 @@ $ npm install postcss-inline-media
 postcss([ require('postcss-inline-media')() ])
 ```
 
-Check out [PostCSS][PostCSS] docs for the complete installation.
+Check out [PostCSS](https://github.com/postcss/postcss) docs for the complete installation.
 
 #### This file:
 
@@ -88,4 +88,4 @@ will output:
 }
 ```
 
-## [License](LICENSE)
+## [License](LICENSE.txt)
