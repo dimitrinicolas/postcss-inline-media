@@ -1,0 +1,37 @@
+{
+  "name": "postcss-inline-media",
+  "version": "0.0.1",
+  "description": "Media queries shortcut on PostCSS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dimitrinicolas/postcss-inline-media.git"
+  },
+  "keywords": [
+    "media",
+    "query",
+    "queries",
+    "shortcut",
+    "inline",
+    "postcss"
+  ],
+  "author": "Dimitri NICOLAS",
+  "maintainers": [
+    {
+      "name": "Dimitri NICOLAS <dimitri@pulseheberg.com>",
+      "email": "dimitri@pulseheberg.com"
+    }
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dimitrinicolas/postcss-inline-media/issues"
+  },
+  "homepage": "https://github.com/dimitrinicolas/postcss-inline-media#readme",
+  "dependencies": {
+    "postcss": "^5.0.21",
+    "postcss-value-parser": "^3.3.0"
+  }
+}
