@@ -1,6 +1,6 @@
 {
   "name": "postcss-inline-media",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Media queries shortcut on PostCSS",
   "main": "index.js",
   "scripts": {
@@ -31,7 +31,7 @@
   },
   "homepage": "https://github.com/dimitrinicolas/postcss-inline-media#readme",
   "dependencies": {
-    "postcss": "^5.0.21",
+    "postcss": "^6.0.13",
     "postcss-value-parser": "^3.3.0"
   }
 }
