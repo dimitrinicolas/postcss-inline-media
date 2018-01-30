@@ -12,16 +12,21 @@ $ npm install postcss-inline-media
 
 ```js
 // dependencies
-postcss([ require('postcss-inline-media')() ])
+postcss([ require('postcss-inline-media') ])
 ```
 
 Check out [PostCSS](https://github.com/postcss/postcss) docs for the complete installation.
 
-#### This file:
+#### Example
+
+You can inline media queries just by writing its condition next to an `@` symbol.
+If you only write a number, it will be read as a `max-width` value in pixels.
+
+This file:
 
 ```css
 .btn {
-    margin: 20px 10px @(max-width: 800px) 10px 5px;
+    margin: 20px 10px @(max-width: 800px) 10px 5px @600 5px 0;
 }
 ```
 
@@ -36,30 +41,9 @@ will output:
         margin: 10px 5px;
     }
 }
-```
-
-#### You can use multiple media queries
-
-```css
-.btn {
-    color: blue @(max-width: 800px) red @(print) black;
-}
-```
-
-will output:
-
-```css
-.btn {
-    color: blue;
-}
-@media (max-width: 800px) {
+@media (max-width: 600px) {
     .btn {
-        color: red;
-    }
-}
-@media print {
-    .btn {
-        color: black;
+        margin: 5px 0;
     }
 }
 ```
