@@ -1,6 +1,6 @@
 {
   "name": "postcss-inline-media",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Media queries shortcut on PostCSS",
   "main": "index.js",
   "repository": {
@@ -13,7 +13,8 @@
     "queries",
     "shortcut",
     "inline",
-    "postcss"
+    "postcss",
+    "front end"
   ],
   "author": "Dimitri NICOLAS",
   "maintainers": [

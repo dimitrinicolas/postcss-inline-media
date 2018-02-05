@@ -72,4 +72,32 @@ will output:
 }
 ```
 
+#### Nested conditions
+
+You can nest media queries in parentheses, but you can't set multiples nesting parentheses on the same css property
+
+```css
+div {
+    margin: 50px (30px @(print) 20px @(max-width: 800px) 10px) 5px 5px;
+}
+```
+
+will output:
+
+```css
+div {
+    margin: 50px 30px 5px 5px;
+}
+@media print {
+    div {
+        margin: 50px 20px 5px 5px;
+    }
+}
+@media (max-width: 800px) {
+    div {
+        margin: 50px 10px 5px 5px;
+    }
+}
+```
+
 ## [License](LICENSE.txt)

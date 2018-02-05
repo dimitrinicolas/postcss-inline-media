@@ -3,16 +3,27 @@ var glob = require('glob');
 var valueParser = require('postcss-value-parser');
 
 
-function parse(nodes) {
+function parse(nodes, opts) {
 
     var base = '';
     var querys = [];
+
+    var nestedQuery = false;
 
     for (var i = 0; i < nodes.length; i++) {
 
         var node = nodes[i];
 
-        if (node.type == 'function' && node.value === '@') {
+        if (node.type == 'function' && node.value === '') {
+            var nested = parse(node.nodes, { base: base });
+            for (var j = 0; j < nested.querys.length; j++) {
+                nested.querys[j].value = base + nested.querys[j].value;
+                querys.push(nested.querys[j]);
+            }
+            base = base + nested.base;
+            nestedQuery = true;
+        }
+        else if (node.type == 'function' && node.value === '@') {
             querys[querys.length] = {
                 media: '(',
                 value: ''
@@ -23,7 +34,7 @@ function parse(nodes) {
                 if (item.type == 'function') {
                     querys[querys.length - 1].media += valueParser.stringify(item);
                 } else {
-                    querys[querys.length - 1].media += item.value;
+                    querys[querys.length - 1].media += ((item.before || '') + item.value + (item.after || ''));
                 }
             }
             querys[querys.length - 1].media += ')';
@@ -43,14 +54,29 @@ function parse(nodes) {
             querys[querys.length - 1].media = media;
         }
         else if (querys.length > 0) {
-            if (node.type == 'function') {
-                querys[querys.length - 1].value += valueParser.stringify(node);
-            } else {
-                querys[querys.length - 1].value += node.value;
+            if (nestedQuery) {
+                for (var j = 0; j < querys.length; j++) {
+                    if (node.type == 'function') {
+                        querys[j].value += valueParser.stringify(node);
+                    } else {
+                        querys[j].value += node.value;
+                    }
+                }
+            }
+            else {
+                if (node.type == 'function') {
+                    querys[querys.length - 1].value += valueParser.stringify(node);
+                } else {
+                    querys[querys.length - 1].value += node.value;
+                }
             }
         }
 
-        if (querys.length < 1) {
+        if (nestedQuery && ['word', 'space'].indexOf(node.type) > -1) {
+            base += node.value;
+        }
+
+        if (!nestedQuery && querys.length < 1) {
             if (node.type == 'function') {
                 base += valueParser.stringify(node);
             } else {
@@ -85,7 +111,7 @@ module.exports = postcss.plugin('responsive', function() {
                     if (content.base.replace(/ /gi, '') !== '') {
                         rule.parent.insertBefore(rule, {
                             prop: rule.prop,
-                            value: content.base.replace(/\s\s+|^ | $/g, '')
+                            value: content.base.replace(/\s\s+|^ | $/g, ' ').replace(/^ | $/g, '')
                         });
                     }
 
@@ -112,7 +138,7 @@ module.exports = postcss.plugin('responsive', function() {
                         });
                         mediaRule.append({
                             prop: rule.prop,
-                            value: q.value.replace(/\s\s+|^\s|\s$/g, '')
+                            value: q.value.replace(/\s\s+|^ | $/g, ' ').replace(/^ | $/g, '')
                         });
                         atRule.append(mediaRule);
                         root.append(atRule);

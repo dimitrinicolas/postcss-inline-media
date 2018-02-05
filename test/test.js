@@ -9,7 +9,7 @@ var test = function (input, output, opts, done) {
     if (opts.variable) {
         plugins.push(postcssSimpleVars());
     }
-    postcss(plugins).process(input).then(function(result) {
+    postcss(plugins).process(input, { from: '' }).then(function(result) {
         expect(result.css.replace(/\n|\r/g, ' ')).to.eql(output);
         expect(result.warnings()).to.be.empty;
         done();
@@ -26,7 +26,7 @@ describe('postcss-inline-media', function () {
             var input = 'div { margin: 20px @(max-width: 800px) 10px; }';
             var output = [
                 'div { margin: 20px; }',
-                '@media (max-width:800px) {',
+                '@media (max-width: 800px) {',
                 ' div { margin: 10px; } }'
             ].join(' ');
             test(input, output, {}, done);
@@ -64,7 +64,7 @@ describe('postcss-inline-media', function () {
 
     });
 
-    describe('postcss simple variable', function () {
+    describe('postcss-simple-vars', function () {
 
         it('create media queries', function(done) {
             var input = '$media: (print); div { margin: 20px @media 10px; }';
@@ -72,6 +72,40 @@ describe('postcss-inline-media', function () {
                 'div { margin: 20px; }',
                 '@media (print) {',
                 'div { margin: 10px; } }'
+            ].join(' ');
+            test(input, output, {
+                variable: true
+            }, done);
+        });
+
+    });
+
+    describe('simple nested condition', function () {
+
+        it('create media queries', function(done) {
+            var input = 'div { margin: 20px (15px @800 10px); }';
+            var output = [
+                'div { margin: 20px 15px; }',
+                '@media (max-width: 800px) {',
+                ' div { margin: 20px 10px; } }'
+            ].join(' ');
+            test(input, output, {
+                variable: true
+            }, done);
+        });
+
+    });
+
+    describe('complex nested condition', function () {
+
+        it('create media queries', function(done) {
+            var input = 'div { margin: 20px (15px @(print) 10px @(max-width: 800px) 7px) 5px 5px; }';
+            var output = [
+                'div { margin: 20px 15px 5px 5px; }',
+                '@media print {',
+                ' div { margin: 20px 10px 5px 5px; } }',
+                '@media (max-width: 800px) {',
+                ' div { margin: 20px 7px 5px 5px; } }'
             ].join(' ');
             test(input, output, {
                 variable: true
