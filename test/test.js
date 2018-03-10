@@ -34,7 +34,21 @@ describe('postcss-inline-media', function () {
 
     });
 
-    describe('@800', function () {
+    describe('or operator replacement', function () {
+
+        it('create media queries', function(done) {
+            var input = 'div { margin: 20px @(print or tv) 10px; }';
+            var output = [
+                'div { margin: 20px; }',
+                '@media print,tv {',
+                ' div { margin: 10px; } }'
+            ].join(' ');
+            test(input, output, {}, done);
+        });
+
+    });
+
+    describe('@800 shorthand', function () {
 
         it('create media queries', function(done) {
             var input = 'div { margin: 20px @800 10px; }';
@@ -89,9 +103,7 @@ describe('postcss-inline-media', function () {
                 '@media (max-width: 800px) {',
                 ' div { margin: 20px 10px; } }'
             ].join(' ');
-            test(input, output, {
-                variable: true
-            }, done);
+            test(input, output, {}, done);
         });
 
     });
@@ -107,9 +119,7 @@ describe('postcss-inline-media', function () {
                 '@media (max-width: 800px) {',
                 ' div { margin: 20px 7px 5px 5px; } }'
             ].join(' ');
-            test(input, output, {
-                variable: true
-            }, done);
+            test(input, output, {}, done);
         });
 
     });

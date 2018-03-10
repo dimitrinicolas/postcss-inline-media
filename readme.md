@@ -1,6 +1,13 @@
 # PostCSS Inline Media Queries
 
-It is a [PostCSS](https://github.com/postcss/postcss) plugin that allow writing media queries properties on the same line.
+A [PostCSS](https://github.com/postcss/postcss) plugin that allows you to write
+media queries properties on the same line.
+
+```css
+.title {
+    font-size: 20px @1200 18px @480 16px;
+}
+```
 
 ## Installation
 
@@ -15,18 +22,20 @@ $ npm install postcss-inline-media
 postcss([ require('postcss-inline-media') ])
 ```
 
-Check out [PostCSS](https://github.com/postcss/postcss) docs for the complete installation.
+Check out [PostCSS](https://github.com/postcss/postcss) docs for the complete
+installation.
 
 #### Example
 
-You can inline media queries just by writing its condition next to an `@` symbol.
+You can inline media queries just by writing its condition next to an `@`
+symbol.\
 If you only write a number, it will be read as a `max-width` value in pixels.
 
 This file:
 
 ```css
 .btn {
-    margin: 20px 10px @(max-width: 800px) 10px 5px @600 5px 0;
+    margin: 20px 10px @(print) 10px 5px @600 5px 0;
 }
 ```
 
@@ -36,7 +45,7 @@ will output:
 .btn {
     margin: 20px 10px;
 }
-@media (max-width: 800px) {
+@media (print) {
     .btn {
         margin: 10px 5px;
     }
@@ -100,4 +109,6 @@ div {
 }
 ```
 
-## [License](LICENSE.txt)
+## License
+
+This project is licensed under the [MIT license](LICENSE).
