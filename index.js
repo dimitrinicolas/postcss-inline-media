@@ -1,156 +1,141 @@
-var postcss = require('postcss');
-var glob = require('glob');
-var valueParser = require('postcss-value-parser');
+const glob = require('glob');
+const postcss = require('postcss');
+const valueParser = require('postcss-value-parser');
 
+const parse = (nodes, opts) => {
+  let base = '';
+  let querys = [];
+  let nestedQuery = false;
 
-function parse(nodes, opts) {
+  for (let node of nodes) {
+    if (node.type === 'function' && node.value === '') {
+      const nested = parse(node.nodes, { base: base });
 
-    var base = '';
-    var querys = [];
+      for (let nestedQuery of nested.querys) {
+        nestedQuery.value = base + nestedQuery.value;
+        querys.push(nestedQuery);
+      }
 
-    var nestedQuery = false;
-
-    for (var i = 0; i < nodes.length; i++) {
-
-        var node = nodes[i];
-
-        if (node.type == 'function' && node.value === '') {
-            var nested = parse(node.nodes, { base: base });
-            for (var j = 0; j < nested.querys.length; j++) {
-                nested.querys[j].value = base + nested.querys[j].value;
-                querys.push(nested.querys[j]);
-            }
-            base = base + nested.base;
-            nestedQuery = true;
+      base = base + nested.base;
+      nestedQuery = true;
+    }
+    else if (node.type === 'function' && node.value === '@') {
+      querys[querys.length] = {
+        media: '(',
+        value: ''
+      };
+      querys[querys.length - 1].media = '(';
+      for (let item of node.nodes) {
+        if (item.type === 'function') {
+          querys[querys.length - 1].media += valueParser.stringify(item);
         }
-        else if (node.type == 'function' && node.value === '@') {
-            querys[querys.length] = {
-                media: '(',
-                value: ''
-            };
-            querys[querys.length - 1].media = '(';
-            for (var j = 0; j < node.nodes.length; j++) {
-                var item = node.nodes[j];
-                if (item.type == 'function') {
-                    querys[querys.length - 1].media += valueParser.stringify(item);
-                } else {
-                    querys[querys.length - 1].media += ((item.before || '') + item.value + (item.after || ''));
-                }
-            }
-            querys[querys.length - 1].media += ')';
+        else {
+          querys[querys.length - 1].media += ((item.before || '') + item.value + (item.after || ''));
         }
-        else if (node.type == 'word' && /^@/gi.test(node.value)) {
-            querys[querys.length] = {
-                media: '(',
-                value: ''
-            };
-            var media = node.value.replace(/^@/gi, '');
-            if (parseInt(media) != media) {
-                media = '$' + media;
-            }
-            else {
-                media = '(max-width: ' + media + 'px)';
-            }
-            querys[querys.length - 1].media = media;
+      }
+      querys[querys.length - 1].media += ')';
+    }
+    else if (node.type === 'word' && /^@/gi.test(node.value)) {
+      querys[querys.length] = {
+        media: '(',
+        value: ''
+      };
+      let media = node.value.replace(/^@/gi, '');
+      if (Number.isNaN(parseInt(media))) {
+        media = '$' + media;
+      }
+      else {
+        media = '(max-width: ' + media + 'px)';
+      }
+      querys[querys.length - 1].media = media;
+    }
+    else if (querys.length > 0) {
+      if (nestedQuery) {
+        for (let query of querys) {
+          if (node.type === 'function') {
+            query.value += valueParser.stringify(node);
+          }
+          else {
+            query.value += node.value;
+          }
         }
-        else if (querys.length > 0) {
-            if (nestedQuery) {
-                for (var j = 0; j < querys.length; j++) {
-                    if (node.type == 'function') {
-                        querys[j].value += valueParser.stringify(node);
-                    } else {
-                        querys[j].value += node.value;
-                    }
-                }
-            }
-            else {
-                if (node.type == 'function') {
-                    querys[querys.length - 1].value += valueParser.stringify(node);
-                } else {
-                    querys[querys.length - 1].value += node.value;
-                }
-            }
+      }
+      else {
+        if (node.type === 'function') {
+          querys[querys.length - 1].value += valueParser.stringify(node);
         }
-
-        if (nestedQuery && ['word', 'space'].indexOf(node.type) > -1) {
-            base += node.value;
+        else {
+          querys[querys.length - 1].value += node.value;
         }
-
-        if (!nestedQuery && querys.length < 1) {
-            if (node.type == 'function') {
-                base += valueParser.stringify(node);
-            } else {
-                base += node.value;
-            }
-        }
-
+      }
     }
 
-    return {
-        base: base,
-        querys: querys
-    };
+    if (nestedQuery && ['word', 'space'].indexOf(node.type) !== -1) {
+      base += node.value;
+    }
 
+    if (!nestedQuery && querys.length < 1) {
+      if (node.type === 'function') {
+        base += valueParser.stringify(node);
+      }
+      else {
+        base += node.value;
+      }
+    }
+  }
+
+  return {
+    base,
+    querys
+  };
 }
 
 module.exports = postcss.plugin('responsive', function() {
-    return function (css, result) {
+  return function (css, result) {
+    css.walk(function(rule) {
+      if (rule.type === 'decl') {
+        const root = rule.root();
+        const value = rule.value;
 
-        css.walk(function(rule) {
-            if (rule.type == 'decl') {
+        if (/@/gi.test(value)) {
+          const content = parse(valueParser(value).nodes);
 
-                var root = rule.root(),
-                    value = rule.value;
+          if (content.base.replace(/ /gi, '') !== '') {
+            rule.parent.insertBefore(rule, {
+              prop: rule.prop,
+              value: content.base.replace(/\s\s+|^ | $/g, ' ').replace(/^ | $/g, '')
+            });
+          }
 
-                if (/@/gi.test(value)) {
+          for (let query of content.querys) {
+            let media = query.media;
+            const color = media.indexOf(':') > -1;
+            const parenthesis = media.replace(/^\(/gi, '').indexOf('(') > -1;
 
-                    var parsed = valueParser(value);
-
-                    var content = parse(parsed.nodes);
-
-                    if (content.base.replace(/ /gi, '') !== '') {
-                        rule.parent.insertBefore(rule, {
-                            prop: rule.prop,
-                            value: content.base.replace(/\s\s+|^ | $/g, ' ').replace(/^ | $/g, '')
-                        });
-                    }
-
-                    for (var i = 0; i < content.querys.length; i++) {
-
-                        var q = content.querys[i];
-                        var media = q.media;
-
-                        var color = media.indexOf(':') > -1;
-                        var parenthesis = media.replace(/^\(/gi, '').indexOf('(') > -1;
-
-                        if ((color && parenthesis) || (!color && !parenthesis)) {
-                            media = media.replace(/^\(/gi, '').replace(/\)$/gi, '');
-                        }
-
-                        media = media.replace(/ or /gi, ',');
-
-                        var atRule = postcss.atRule({
-                            name: 'media',
-                            params: media
-                        });
-                        var mediaRule = postcss.rule({
-                            selector: rule.parent.selector,
-                        });
-                        mediaRule.append({
-                            prop: rule.prop,
-                            value: q.value.replace(/\s\s+|^ | $/g, ' ').replace(/^ | $/g, '')
-                        });
-                        atRule.append(mediaRule);
-                        root.append(atRule);
-
-                    }
-
-                    rule.remove();
-
-                }
-
+            if ((color && parenthesis) || (!color && !parenthesis)) {
+              media = media.replace(/^\(/gi, '').replace(/\)$/gi, '');
             }
-        });
 
-    };
+            media = media.replace(/ or /gi, ',');
+
+            const atRule = postcss.atRule({
+              name: 'media',
+              params: media
+            });
+            const mediaRule = postcss.rule({
+              selector: rule.parent.selector,
+            });
+            mediaRule.append({
+              prop: rule.prop,
+              value: query.value.replace(/\s\s+|^ | $/g, ' ').replace(/^ | $/g, '')
+            });
+            atRule.append(mediaRule);
+            root.append(atRule);
+          }
+
+          rule.remove();
+        }
+      }
+    });
+  };
 });
