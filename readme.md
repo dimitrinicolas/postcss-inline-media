@@ -25,11 +25,15 @@ postcss([ require('postcss-inline-media') ])
 Check out [PostCSS](https://github.com/postcss/postcss) docs for the complete
 installation.
 
-#### Example
+### Example
 
 You can inline media queries just by writing its condition next to an `@`
-symbol.\
-If you only write a number, it will be read as a `max-width` value in pixels.
+symbol.
+
+If you only write a number after the `@`, it will be read as a `max-width` value
+in pixels, you can change this shorthand with the `shorthand` and
+'shorthandUnit' option of this plugin, eg:
+`require('postcss-inline-media')({ shorthand: 'min-width' })`.
 
 This file:
 
@@ -57,9 +61,12 @@ will output:
 }
 ```
 
-#### Media queries variables
+### Media queries variables
 
-You can use [postcss-simple-vars](https://github.com/postcss/postcss-simple-vars) as media queries shortcut
+You can use
+[**postcss-simple-vars**](https://github.com/postcss/postcss-simple-vars) as
+media queries shortcut, put the `postcss-simple-vars` plugin **after**
+`postcss-inline-media`.
 
 ```css
 $md: (max-width: 900px);
@@ -81,9 +88,10 @@ will output:
 }
 ```
 
-#### Nested conditions
+### Nested conditions
 
-You can nest media queries in parentheses, but you can't set multiples nesting parentheses on the same css property
+You can nest media queries in parentheses, but you can't set multiples nesting
+parentheses on the same css property.
 
 ```css
 div {
@@ -106,6 +114,31 @@ div {
     div {
         margin: 50px 10px 5px 5px;
     }
+}
+```
+
+### postcss-media-minmax
+
+And this plugin is also compatible with
+[**postcss-media-minmax**](https://github.com/postcss/postcss-media-minmax), put
+the `postcss-media-minmax` plugin **after** `postcss-inline-media`.
+
+```css
+.btn {
+    padding: 20px @(width <= 500px) 10px;
+}
+```
+
+### postcss-custom-media
+
+You can also use
+[**postcss-custom-media**](https://github.com/postcss/postcss-custom-media), put
+the `postcss-custom-media` plugin **after** `postcss-inline-media`.
+
+```css
+@custom-media --small-viewport (max-width: 30em);
+.btn {
+    padding: 20px @(--small-viewport) 10px;
 }
 ```
 

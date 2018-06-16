@@ -9,7 +9,7 @@ const parse = (nodes, opts) => {
 
   for (let node of nodes) {
     if (node.type === 'function' && node.value === '') {
-      const nested = parse(node.nodes, { base: base });
+      const nested = parse(node.nodes, Object.assign({}, opts, { base: base }));
 
       for (let nestedQuery of nested.querys) {
         nestedQuery.value = base + nestedQuery.value;
@@ -42,10 +42,10 @@ const parse = (nodes, opts) => {
       };
       let media = node.value.replace(/^@/gi, '');
       if (Number.isNaN(parseInt(media))) {
-        media = '$' + media;
+        media = `$${media}`;
       }
       else {
-        media = '(max-width: ' + media + 'px)';
+        media = `(${opts.shorthand}: ${media}${opts.shorthandUnit})`;
       }
       querys[querys.length - 1].media = media;
     }
@@ -90,7 +90,7 @@ const parse = (nodes, opts) => {
   };
 }
 
-module.exports = postcss.plugin('responsive', function() {
+module.exports = postcss.plugin('postcss-inline-media', function(opts={}) {
   return function (css, result) {
     css.walk(function(rule) {
       if (rule.type === 'decl') {
@@ -98,7 +98,10 @@ module.exports = postcss.plugin('responsive', function() {
         const value = rule.value;
 
         if (/@/gi.test(value)) {
-          const content = parse(valueParser(value).nodes);
+          const content = parse(valueParser(value).nodes, {
+            shorthand: typeof opts.shorthand === 'string' ? opts.shorthand : 'max-width',
+            shorthandUnit: typeof opts.shorthandUnit === 'string' ? opts.shorthandUnit : 'px'
+          });
 
           if (content.base.replace(/ /gi, '') !== '') {
             rule.parent.insertBefore(rule, {
@@ -109,10 +112,10 @@ module.exports = postcss.plugin('responsive', function() {
 
           for (let query of content.querys) {
             let media = query.media;
-            const color = media.indexOf(':') > -1;
-            const parenthesis = media.replace(/^\(/gi, '').indexOf('(') > -1;
+            const special = media.indexOf(':') !== -1 || media.indexOf('--') !== -1 || media.indexOf('>') !== -1 || media.indexOf('<') !== -1;
+            const parenthesis = media.replace(/^\(/gi, '').indexOf('(') !== -1;
 
-            if ((color && parenthesis) || (!color && !parenthesis)) {
+            if ((special && parenthesis) || (!special && !parenthesis)) {
               media = media.replace(/^\(/gi, '').replace(/\)$/gi, '');
             }
 

@@ -1,29 +1,26 @@
 {
   "name": "postcss-inline-media",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Media queries shortcut on PostCSS",
+  "license": "MIT",
   "main": "index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dimitrinicolas/postcss-inline-media.git"
   },
+  "author": {
+    "name": "Dimitri NICOLAS",
+    "email": "dimitri@fivecorp.fr"
+  },
   "keywords": [
+    "front-end",
+    "postcss",
+    "inline",
     "media",
     "query",
     "queries",
-    "shortcut",
-    "inline",
-    "postcss",
-    "front-end"
+    "shortcut"
   ],
-  "author": "Dimitri NICOLAS",
-  "maintainers": [
-    {
-      "name": "Dimitri NICOLAS <dimitri@fivecorp.fr>",
-      "email": "dimitri@fivecorp.fr"
-    }
-  ],
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/dimitrinicolas/postcss-inline-media/issues"
   },
@@ -34,13 +31,14 @@
     "postcss-value-parser": "^3.3.0"
   },
   "scripts": {
-    "test": "mocha",
-    "watch": "nodemon -e js -x \"mocha\""
+    "test": "ava",
+    "watch": "nodemon -e js -x \"ava\""
   },
   "devDependencies": {
-    "chai": "^4.1.2",
-    "mocha": "^5.2.0",
+    "ava": "1.0.0-beta.6",
     "nodemon": "^1.17.5",
+    "postcss-custom-media": "^6.0.0",
+    "postcss-media-minmax": "^3.0.0",
     "postcss-simple-vars": "^4.1.0"
   }
 }
