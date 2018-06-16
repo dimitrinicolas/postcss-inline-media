@@ -1,4 +1,4 @@
-# PostCSS Inline Media Queries
+# PostCSS Inline Media Queries [![Build Status](https://travis-ci.org/dimitrinicolas/postcss-inline-media.svg?branch=master)](https://travis-ci.org/dimitrinicolas/postcss-inline-media)
 
 A [PostCSS](https://github.com/postcss/postcss) plugin that allows you to write
 media queries properties on the same line.
