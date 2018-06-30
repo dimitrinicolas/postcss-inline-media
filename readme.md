@@ -119,7 +119,7 @@ div {
 
 ### postcss-media-minmax
 
-And this plugin is also compatible with
+This plugin is compatible with
 [**postcss-media-minmax**](https://github.com/postcss/postcss-media-minmax), put
 the `postcss-media-minmax` plugin **after** `postcss-inline-media`.
 

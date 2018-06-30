@@ -35,7 +35,7 @@
     "watch": "nodemon -e js -x \"ava\""
   },
   "devDependencies": {
-    "ava": "1.0.0-beta.6",
+    "ava": "^0.25.0",
     "nodemon": "^1.17.5",
     "postcss-custom-media": "^6.0.0",
     "postcss-media-minmax": "^3.0.0",
