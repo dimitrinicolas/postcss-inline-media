@@ -3,3 +3,4 @@ node_js:
   - stable
   - "8"
   - "6"
+after_success: npm run coverage

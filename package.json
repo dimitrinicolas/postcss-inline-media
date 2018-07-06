@@ -31,12 +31,15 @@
     "postcss-value-parser": "^3.3.0"
   },
   "scripts": {
-    "test": "ava",
-    "watch": "nodemon -e js -x \"ava\""
+    "test": "nyc ava",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "watch": "nodemon -e js -x \"npm run test\""
   },
   "devDependencies": {
     "ava": "^0.25.0",
+    "coveralls": "^3.0.2",
     "nodemon": "^1.17.5",
+    "nyc": "^12.0.2",
     "postcss-custom-media": "^6.0.0",
     "postcss-media-minmax": "^3.0.0",
     "postcss-simple-vars": "^4.1.0"

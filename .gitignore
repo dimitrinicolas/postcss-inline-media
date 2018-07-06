@@ -4,3 +4,6 @@ logs
 *.log*
 tmp
 .DS_Store
+.nyc_output
+coverage
+yarn.lock
