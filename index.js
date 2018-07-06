@@ -2,6 +2,25 @@ const glob = require('glob');
 const postcss = require('postcss');
 const valueParser = require('postcss-value-parser');
 
+/**
+ * gets string value of a node
+ * @param {Node} node 
+ * @returns {string} node value
+ */
+const getValue = (node) => {
+  if (node.type === 'function') {
+    return valueParser.stringify(node);
+  } else {
+    return node.value;
+  }
+};
+
+/**
+ * parse nodes
+ * @param {Node[]} nodes 
+ * @param {object} opts 
+ * @returns {{ base: {string}, querys: {MediaQuery[]} }}
+ */
 const parse = (nodes, opts) => {
   let base = '';
   let querys = [];
@@ -9,7 +28,7 @@ const parse = (nodes, opts) => {
 
   for (let node of nodes) {
     if (node.type === 'function' && node.value === '') {
-      const nested = parse(node.nodes, Object.assign({}, opts, { base: base }));
+      const nested = parse(node.nodes, Object.assign({}, opts, { base }));
 
       for (let nestedQuery of nested.querys) {
         nestedQuery.value = base + nestedQuery.value;
@@ -28,8 +47,7 @@ const parse = (nodes, opts) => {
       for (let item of node.nodes) {
         if (item.type === 'function') {
           querys[querys.length - 1].media += valueParser.stringify(item);
-        }
-        else {
+        } else {
           querys[querys.length - 1].media += ((item.before || '') + item.value + (item.after || ''));
         }
       }
@@ -52,35 +70,25 @@ const parse = (nodes, opts) => {
     else if (querys.length > 0) {
       if (nestedQuery) {
         for (let query of querys) {
-          if (node.type === 'function') {
-            query.value += valueParser.stringify(node);
-          }
-          else {
-            query.value += node.value;
-          }
+          query.value += getValue(node);
         }
       }
       else {
-        if (node.type === 'function') {
-          querys[querys.length - 1].value += valueParser.stringify(node);
-        }
-        else {
-          querys[querys.length - 1].value += node.value;
-        }
+        querys[querys.length - 1].value += getValue(node);
       }
     }
 
-    if (nestedQuery && ['word', 'space'].indexOf(node.type) !== -1) {
-      base += node.value;
+    if (nestedQuery) {
+      if (['word', 'space'].indexOf(node.type) !== -1) {
+        base += getValue(node);
+      }
+      else if (node.type === 'function' && ['', '@'].indexOf(node.value) === -1) {
+        base += getValue(node);
+      }
     }
 
     if (!nestedQuery && querys.length < 1) {
-      if (node.type === 'function') {
-        base += valueParser.stringify(node);
-      }
-      else {
-        base += node.value;
-      }
+      base += getValue(node);
     }
   }
 

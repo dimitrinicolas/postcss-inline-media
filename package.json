@@ -1,6 +1,6 @@
 {
   "name": "postcss-inline-media",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Media queries shortcut on PostCSS",
   "license": "MIT",
   "main": "index.js",
@@ -31,7 +31,7 @@
     "postcss-value-parser": "^3.3.0"
   },
   "scripts": {
-    "test": "nyc ava",
+    "test": "nyc --reporter=lcov --reporter=text ava",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "watch": "nodemon -e js -x \"npm run test\""
   },

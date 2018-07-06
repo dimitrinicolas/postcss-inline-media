@@ -112,6 +112,7 @@ test('simple nested condition', async t => {
 });
 
 test('complex nested condition', async t => {
+  console.log('———');
   const input = 'div { margin: 20px (15px @(print) 10px @(max-width: 800px) 7px) 5px 5px; }';
   const output = [
     'div { margin: 20px 15px 5px 5px; }',
@@ -121,6 +122,18 @@ test('complex nested condition', async t => {
     ' div { margin: 20px 7px 5px 5px; } }'
   ].join(' ');
   testPostcss(input, output, t);
+});
+
+test('complex nested condition with function node', async t => {
+  console.log('———');
+  const input = 'div { margin: 20px (15px @(print) 10px) 7px func(8px); }';
+  const output = [
+    'div { margin: 20px 15px 7px func(8px); }',
+    '@media print {',
+    ' div { margin: 20px 10px 7px func(8px); } }'
+  ].join(' ');
+  testPostcss(input, output, t);
+  console.log('—————————');
 });
 
 test('postcss-custom-media', async t => {
