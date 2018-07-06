@@ -27,7 +27,7 @@
   "homepage": "https://github.com/dimitrinicolas/postcss-inline-media#readme",
   "dependencies": {
     "glob": "^7.1.2",
-    "postcss": "^6.0.22",
+    "postcss": "^6.0.23",
     "postcss-value-parser": "^3.3.0"
   },
   "scripts": {

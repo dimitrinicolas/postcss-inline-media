@@ -15,7 +15,7 @@ const testPostcss = (input, output, t, opts={}) => {
     plugins.push(plugin);
   }
   postcss(plugins).process(input, { from: '' }).then((result) => {
-    t.is(result.css.replace(/\n|\r/g, ' '), output);
+    t.is(result.css.replace(/\n|\r/g, ' '), output.replace(/\n|\r/g, ' '));
     t.is(result.warnings().length, 0);
     t.pass();
   }).catch(() => {
@@ -29,6 +29,16 @@ test('@(max-width: 800px)', async t => {
     'div { margin: 20px; }',
     '@media (max-width: 800px) {',
     ' div { margin: 10px; } }'
+  ].join(' ');
+  testPostcss(input, output, t);
+});
+
+test('no default value', async t => {
+  const input = 'div { margin: @(max-width: 800px) 10px; }';
+  const output = [
+    'div { }',
+    '@media (max-width: 800px) {',
+    '    div {         margin: 10px     } }'
   ].join(' ');
   testPostcss(input, output, t);
 });
@@ -112,7 +122,6 @@ test('simple nested condition', async t => {
 });
 
 test('complex nested condition', async t => {
-  console.log('———');
   const input = 'div { margin: 20px (15px @(print) 10px @(max-width: 800px) 7px) 5px 5px; }';
   const output = [
     'div { margin: 20px 15px 5px 5px; }',
@@ -125,7 +134,6 @@ test('complex nested condition', async t => {
 });
 
 test('complex nested condition with function node', async t => {
-  console.log('———');
   const input = 'div { margin: 20px (15px @(print) 10px) 7px func(8px); }';
   const output = [
     'div { margin: 20px 15px 7px func(8px); }',
@@ -133,7 +141,6 @@ test('complex nested condition with function node', async t => {
     ' div { margin: 20px 10px 7px func(8px); } }'
   ].join(' ');
   testPostcss(input, output, t);
-  console.log('—————————');
 });
 
 test('postcss-custom-media', async t => {
