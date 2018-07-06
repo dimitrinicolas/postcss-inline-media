@@ -1,4 +1,4 @@
-# PostCSS Inline Media Queries [![Build Status](https://travis-ci.org/dimitrinicolas/postcss-inline-media.svg?branch=master)](https://travis-ci.org/dimitrinicolas/postcss-inline-media)
+# PostCSS Inline Media Queries [![Build Status](https://travis-ci.org/dimitrinicolas/postcss-inline-media.svg?branch=master)](https://travis-ci.org/dimitrinicolas/postcss-inline-media) [![Coverage Status](https://coveralls.io/repos/github/dimitrinicolas/postcss-inline-media/badge.svg?branch=master)](https://coveralls.io/github/dimitrinicolas/postcss-inline-media?branch=master)
 
 A [PostCSS](https://github.com/postcss/postcss) plugin that allows you to write
 media queries properties on the same line.
