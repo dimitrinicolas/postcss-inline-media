@@ -1,7 +1,7 @@
 # Change Log
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 1.1.2 - 2018-07-06
+## 1.1.2 - 2018-08-03
 ### Changed
 - Updated PostCSS dependency to v7.
 
