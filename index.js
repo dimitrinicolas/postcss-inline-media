@@ -1,50 +1,47 @@
-const glob = require('glob');
 const postcss = require('postcss');
 const valueParser = require('postcss-value-parser');
 
 /**
  * gets string value of a node
- * @param {Node} node 
+ * @param {Node} node
  * @returns {string} node value
  */
-const getValue = (node) => {
+const getValue = node => {
   if (node.type === 'function') {
     return valueParser.stringify(node);
-  } else {
-    return node.value;
   }
+  return node.value;
 };
 
 /**
  * parse nodes
- * @param {Node[]} nodes 
- * @param {object} opts 
+ * @param {Node[]} nodes
+ * @param {object} opts
  * @returns {{ base: {string}, querys: {MediaQuery[]} }}
  */
 const parse = (nodes, opts) => {
   let base = '';
-  let querys = [];
+  const querys = [];
   let nestedQuery = false;
 
-  for (let node of nodes) {
+  for (const node of nodes) {
     if (node.type === 'function' && node.value === '') {
       const nested = parse(node.nodes, Object.assign({}, opts, { base }));
 
-      for (let nestedQuery of nested.querys) {
-        nestedQuery.value = base + nestedQuery.value;
-        querys.push(nestedQuery);
+      for (const query of nested.querys) {
+        query.value = base + query.value;
+        querys.push(query);
       }
 
-      base = base + nested.base;
+      base += nested.base;
       nestedQuery = true;
-    }
-    else if (node.type === 'function' && node.value === '@') {
+    } else if (node.type === 'function' && node.value === '@') {
       querys[querys.length] = {
         media: '(',
         value: ''
       };
       querys[querys.length - 1].media = '(';
-      for (let item of node.nodes) {
+      for (const item of node.nodes) {
         if (item.type === 'function') {
           querys[querys.length - 1].media += valueParser.stringify(item);
         } else {
@@ -52,28 +49,24 @@ const parse = (nodes, opts) => {
         }
       }
       querys[querys.length - 1].media += ')';
-    }
-    else if (node.type === 'word' && /^@/gi.test(node.value)) {
+    } else if (node.type === 'word' && /^@/gi.test(node.value)) {
       querys[querys.length] = {
         media: '(',
         value: ''
       };
       let media = node.value.replace(/^@/gi, '');
-      if (Number.isNaN(parseInt(media))) {
+      if (Number.isNaN(parseInt(media, 10))) {
         media = `$${media}`;
-      }
-      else {
+      } else {
         media = `(${opts.shorthand}: ${media}${opts.shorthandUnit})`;
       }
       querys[querys.length - 1].media = media;
-    }
-    else if (querys.length > 0) {
+    } else if (querys.length > 0) {
       if (nestedQuery) {
-        for (let query of querys) {
+        for (const query of querys) {
           query.value += getValue(node);
         }
-      }
-      else {
+      } else {
         querys[querys.length - 1].value += getValue(node);
       }
     }
@@ -81,8 +74,7 @@ const parse = (nodes, opts) => {
     if (nestedQuery) {
       if (['word', 'space'].indexOf(node.type) !== -1) {
         base += getValue(node);
-      }
-      else if (node.type === 'function' && ['', '@'].indexOf(node.value) === -1) {
+      } else if (node.type === 'function' && ['', '@'].indexOf(node.value) === -1) {
         base += getValue(node);
       }
     }
@@ -96,11 +88,11 @@ const parse = (nodes, opts) => {
     base,
     querys
   };
-}
+};
 
-module.exports = postcss.plugin('postcss-inline-media', function(opts={}) {
-  return function (css, result) {
-    css.walk(function(rule) {
+module.exports = postcss.plugin('postcss-inline-media', (opts = {}) => {
+  return css => {
+    css.walk(rule => {
       if (rule.type === 'decl') {
         const root = rule.root();
         const value = rule.value;
@@ -118,7 +110,7 @@ module.exports = postcss.plugin('postcss-inline-media', function(opts={}) {
             });
           }
 
-          for (let query of content.querys) {
+          for (const query of content.querys) {
             let media = query.media;
             const special = media.indexOf(':') !== -1 || media.indexOf('--') !== -1 || media.indexOf('>') !== -1 || media.indexOf('<') !== -1;
             const parenthesis = media.replace(/^\(/gi, '').indexOf('(') !== -1;
