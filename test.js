@@ -179,21 +179,46 @@ test('postcss-media-minmax many', async t => {
   });
 });
 
-test('test', async t => {
+test('nested rules', async t => {
   const input = 'div { margin: 20px @900 10px @600 5px; padding: 20px @900 10px; header { span { color: black @900 red; } } } span { color: black @900 red; }';
   const output = [
-    'div { margin: 20px; padding: 20px; header { span { color: black; } } }',
-    'span { color: black; }',
-    '@media (max-width: 900px) {',
+    'div {',
+    'margin: 20px; padding: 20px; header {',
+    'span { color: black; } @media (max-width: 900px) { span { color: red; } }',
+    '} } span { color: black; } @media (max-width: 900px) {',
     'div { margin: 10px; padding: 10px; }',
-    'div header span { color: red; }',
-    '}',
-    '@media (max-width: 600px) {',
-    'div { margin: 5px; }',
-    '}',
+    '} @media (max-width: 600px) { div { margin: 5px; } }',
+    '@media (max-width: 900px) { span { color: red; } }'
+  ].join(' ');
+  testPostcss(input, output, t);
+});
+
+test('nested pseudo element', async t => {
+  const input = 'div { margin: 20px @900 10px; padding: @600 10px; &::before { color: black @900 red; } }';
+  const output = [
+    'div {',
+    'margin: 20px; &::before { color: black; }',
     '@media (max-width: 900px) {',
-    'span { color: red; }',
-    '}'
+    '&::before { color: red; }',
+    '} }',
+    '@media (max-width: 900px) {',
+    'div { margin: 10px; }',
+    '} @media (max-width: 600px) { div { padding: 10px; } }'
+  ].join(' ');
+  testPostcss(input, output, t);
+});
+
+test('nested unknown rule type', async t => {
+  const input = 'div { margin: 20px @900 10px; padding: @600 10px; -something { color: black @900 red; } }';
+  const output = [
+    'div {',
+    'margin: 20px; -something { color: black; }',
+    '@media (max-width: 900px) {',
+    '-something { color: red; }',
+    '} }',
+    '@media (max-width: 900px) {',
+    'div { margin: 10px; }',
+    '} @media (max-width: 600px) { div { padding: 10px; } }'
   ].join(' ');
   testPostcss(input, output, t);
 });

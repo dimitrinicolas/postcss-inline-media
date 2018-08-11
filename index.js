@@ -106,29 +106,6 @@ const parse = (nodes, opts) => {
 };
 
 /**
- * Return the css rule parent of depth 1
- * @param {rule} rule
- */
-const deepParent = rule => {
-  if (rule.parent.type === 'rule') {
-    return deepParent(rule.parent);
-  }
-  return rule;
-};
-
-/**
- * Return nested selector
- * @param {rule} rule
- * @param {string} [suffix='']
- */
-const deepParentSelector = (rule, suffix = '') => {
-  if (rule.parent.type === 'rule') {
-    return deepParentSelector(rule.parent, `${rule.parent.selector} ${suffix}`);
-  }
-  return suffix;
-};
-
-/**
  * Query class
  * @param {string} selector
  * @param {string} prop
@@ -166,56 +143,34 @@ class Query {
 /**
  * RulePack class
  * @param {string} parent
+ * @param {string} selector
  */
 class RulePack {
-  constructor(parent) {
+  constructor(parent, selector) {
     this.parent = parent;
+    this.selector = selector;
     this.queries = [];
   }
 
-  addQuery({ selector, prop, content }) {
+  addQuery({ prop, content }) {
     content.queries.forEach(({ media, value }) => {
       let foundMedia = false;
       this.queries.forEach(item => {
         if (item.media === media && !foundMedia) {
           foundMedia = true;
-
-          let foundSelector = false;
-          item.selectors.forEach(selectorPack => {
-            if (selectorPack.selector === selector && !foundSelector) {
-              foundSelector = true;
-
-              selectorPack.queries.push({
-                prop,
-                value
-              });
-            }
+          item.queries.push({
+            prop,
+            value
           });
-          if (!foundSelector) {
-            item.selectors.push({
-              selector,
-              queries: [
-                {
-                  prop,
-                  value
-                }
-              ]
-            });
-          }
         }
       });
       if (!foundMedia) {
         this.queries.push({
           media,
-          selectors: [
+          queries: [
             {
-              selector,
-              queries: [
-                {
-                  prop,
-                  value
-                }
-              ]
+              prop,
+              value
             }
           ]
         });
@@ -238,16 +193,16 @@ module.exports = postcss.plugin('postcss-inline-media', (opts = {}) => {
           shorthandUnit: typeof opts.shorthandUnit === 'string'
             ? opts.shorthandUnit : 'px'
         });
-        const parent = deepParent(rule);
 
-        const query = new Query(deepParentSelector(rule), rule.prop, content);
+        const query = new Query(rule.parent.selector, rule.prop, content);
         if (
           mediaQueries.length
-          && mediaQueries[mediaQueries.length - 1].parent === parent
+          && mediaQueries[mediaQueries.length - 1].parent === rule.parent
+          && mediaQueries[mediaQueries.length - 1].selector === query.selector
         ) {
           mediaQueries[mediaQueries.length - 1].addQuery(query);
         } else {
-          const pack = new RulePack(parent);
+          const pack = new RulePack(rule.parent, query.selector);
           pack.addQuery(query);
           mediaQueries.push(pack);
         }
@@ -264,26 +219,24 @@ module.exports = postcss.plugin('postcss-inline-media', (opts = {}) => {
     });
 
     mediaQueries.forEach(mq => {
-      const root = mq.parent.root();
+      const root = mq.parent.parent;
 
-      mq.queries.forEach(({ media, selectors }) => {
+      mq.queries.forEach(({ media, queries }) => {
         const atRule = postcss.atRule({
           name: 'media',
           params: media
         });
 
-        selectors.forEach(({ selector, queries }) => {
-          const mediaRule = postcss.rule({
-            selector
-          });
-          queries.forEach(({ prop, value }) => {
-            mediaRule.append({
-              prop,
-              value
-            });
-          });
-          atRule.append(mediaRule);
+        const mediaRule = postcss.rule({
+          selector: mq.selector
         });
+        queries.forEach(({ prop, value }) => {
+          mediaRule.append({
+            prop,
+            value
+          });
+        });
+        atRule.append(mediaRule);
 
         root.append(atRule);
       });

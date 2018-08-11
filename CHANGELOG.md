@@ -3,6 +3,10 @@
 This project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.2.1 - 2018-08-11
+### Changed
+- Simpler nested rules management system.
+
 ## 1.2.0 - 2018-08-11
 ### Added
 - Now packing together same media queries and same selectors, respecting css
