@@ -1,6 +1,6 @@
 {
   "name": "postcss-inline-media",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Media queries shortcut on PostCSS",
   "license": "MIT",
   "main": "index.js",
