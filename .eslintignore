@@ -1,2 +1,3 @@
 coverage/**/*.js
 .nyc_output/**/*.js
+test.js

@@ -1,5 +1,14 @@
 # Change Log
-This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+This project adheres to
+[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## 1.2.0 - 2018-08-11
+### Added
+- Now packing together same media queries and same selectors, respecting css
+priority order.
+### Changed
+- Now supporting nested rules.
 
 ## 1.1.2 - 2018-08-03
 ### Changed
