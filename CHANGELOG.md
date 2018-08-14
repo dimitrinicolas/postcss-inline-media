@@ -3,6 +3,10 @@
 This project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.3.0 - 2018-08-15
+### Added
+- Source for new nodes to generate an accurate source map.
+
 ## 1.2.1 - 2018-08-11
 ### Changed
 - Simpler nested rules management system.

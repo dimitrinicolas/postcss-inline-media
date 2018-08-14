@@ -19,7 +19,8 @@
     "media",
     "query",
     "queries",
-    "shortcut"
+    "shortcut",
+    "postcss-plugin"
   ],
   "bugs": {
     "url": "https://github.com/dimitrinicolas/postcss-inline-media/issues"

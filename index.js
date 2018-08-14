@@ -184,10 +184,10 @@ class RulePack {
 }
 
 module.exports = postcss.plugin('postcss-inline-media', (opts = {}) => {
-  return css => {
+  return root => {
     const mediaQueries = [];
 
-    css.walk(rule => {
+    root.walk(rule => {
       if (rule.type !== 'decl') return;
       const value = rule.value;
       if (/@/gi.test(value)) {
@@ -226,7 +226,7 @@ module.exports = postcss.plugin('postcss-inline-media', (opts = {}) => {
     });
 
     mediaQueries.forEach(mq => {
-      const root = mq.parent.parent;
+      const nodeRoot = mq.parent.parent;
 
       mq.queries.forEach(({ media, queries, source }) => {
         const atRule = postcss.atRule({
@@ -246,7 +246,7 @@ module.exports = postcss.plugin('postcss-inline-media', (opts = {}) => {
         atRule.append(mediaRule);
         atRule.source = source;
 
-        root.append(atRule);
+        nodeRoot.append(atRule);
       });
 
       mq.rules.forEach(rule => {
