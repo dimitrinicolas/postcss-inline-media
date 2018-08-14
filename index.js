@@ -109,12 +109,14 @@ const parse = (nodes, opts) => {
  * Query class
  * @param {string} selector
  * @param {string} prop
+ * @param {object} source
  * @param {object} content
  */
 class Query {
-  constructor(selector, prop, content) {
+  constructor(selector, prop, source, content) {
     this.selector = cleanString(selector);
     this.prop = cleanString(prop);
+    this.source = source;
 
     const queries = content.queries.map(({ media, value }) => {
       const special = media.indexOf(':') !== -1
@@ -142,17 +144,19 @@ class Query {
 
 /**
  * RulePack class
- * @param {string} parent
+ * @param {string} rule
  * @param {string} selector
  */
 class RulePack {
-  constructor(parent, selector) {
-    this.parent = parent;
+  constructor(rule, selector) {
+    this.rules = [rule];
+    this.parent = rule.parent;
     this.selector = selector;
     this.queries = [];
   }
 
-  addQuery({ prop, content }) {
+  addQuery(rule, { prop, content }) {
+    this.rules.push(rule);
     content.queries.forEach(({ media, value }) => {
       let foundMedia = false;
       this.queries.forEach(item => {
@@ -194,16 +198,21 @@ module.exports = postcss.plugin('postcss-inline-media', (opts = {}) => {
             ? opts.shorthandUnit : 'px'
         });
 
-        const query = new Query(rule.parent.selector, rule.prop, content);
+        const query = new Query(
+          rule.parent.selector,
+          rule.prop,
+          rule.source,
+          content
+        );
         if (
           mediaQueries.length
           && mediaQueries[mediaQueries.length - 1].parent === rule.parent
           && mediaQueries[mediaQueries.length - 1].selector === query.selector
         ) {
-          mediaQueries[mediaQueries.length - 1].addQuery(query);
+          mediaQueries[mediaQueries.length - 1].addQuery(rule, query);
         } else {
-          const pack = new RulePack(rule.parent, query.selector);
-          pack.addQuery(query);
+          const pack = new RulePack(rule, query.selector);
+          pack.addQuery(rule, query);
           mediaQueries.push(pack);
         }
 
@@ -213,15 +222,13 @@ module.exports = postcss.plugin('postcss-inline-media', (opts = {}) => {
             value: content.base
           });
         }
-
-        rule.remove();
       }
     });
 
     mediaQueries.forEach(mq => {
       const root = mq.parent.parent;
 
-      mq.queries.forEach(({ media, queries }) => {
+      mq.queries.forEach(({ media, queries, source }) => {
         const atRule = postcss.atRule({
           name: 'media',
           params: media
@@ -237,8 +244,13 @@ module.exports = postcss.plugin('postcss-inline-media', (opts = {}) => {
           });
         });
         atRule.append(mediaRule);
+        atRule.source = source;
 
         root.append(atRule);
+      });
+
+      mq.rules.forEach(rule => {
+        rule.remove();
       });
     });
   };

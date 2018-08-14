@@ -261,6 +261,29 @@ test('nested rules', async t => {
       span { color: red; }
     }
   `;
+  const a = /* scss */`
+    div { 
+      margin: 20px;
+      padding: 20px;
+      header {
+        span { color: black; }
+        @media (max-width: 900px) { span { color: red; } }
+      }
+    }
+    span { color: black; }
+    @media (max-width: 900px) {
+      div { margin: 10px; }
+    }
+    @media (max-width: 600px) {
+      div { margin: 5px; }
+    }
+    @media (max-width: 900px) {
+      div { padding: 10px; }
+    }
+    @media (max-width: 800px) {
+      span { color: red; }
+    }
+  `;
   tester.test(input, output, t);
 });
 
