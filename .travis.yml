@@ -4,7 +4,12 @@ node_js:
   - stable
   - "8"
 
-after_success: npm run coverage
+install:
+  - npm install -g codecov
+
+after_success:
+  - npm run coverage
+  - codecov
 
 # Telegram bot
 notifications:

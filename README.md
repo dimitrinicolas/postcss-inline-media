@@ -18,7 +18,7 @@ $ npm install postcss-inline-media
 ## Usage
 
 ```js
-// Postcss plugins
+// PostCSS plugins
 postcss([ require('postcss-inline-media') ])
 ```
 
