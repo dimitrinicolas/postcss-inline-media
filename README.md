@@ -1,4 +1,5 @@
 # postcss-inline-media [![Build Status][travis badge]][travis link] [![Coverage Status][coveralls badge]][coveralls link]
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdimitrinicolas%2Fpostcss-inline-media.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdimitrinicolas%2Fpostcss-inline-media?ref=badge_shield)
 
 A [PostCSS][postcss] plugin that allows you to write media queries properties 
 on the same line.
@@ -165,3 +166,6 @@ This project is licensed under the [MIT license](LICENSE).
 [postcss-media-minmax]: https://github.com/postcss/postcss-media-minmax
 [postcss-custom-media]: https://github.com/postcss/postcss-custom-media
 [ava-postcss-tester]: https://github.com/dimitrinicolas/ava-postcss-tester
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdimitrinicolas%2Fpostcss-inline-media.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdimitrinicolas%2Fpostcss-inline-media?ref=badge_large)
