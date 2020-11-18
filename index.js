@@ -6,7 +6,7 @@ const valueParser = require('postcss-value-parser');
  * @param {Node} node
  * @returns {string} node value
  */
-const getValue = node => {
+const getValue = (node) => {
   if (node.type === 'function') {
     return valueParser.stringify(node);
   }
@@ -17,7 +17,7 @@ const getValue = node => {
  * Remove extra spaces from strings
  * @param {string} str
  */
-const cleanString = str => {
+const cleanString = (str) => {
   return str.replace(/\s\s+|^ | $/g, ' ').replace(/^ | $/g, '');
 };
 
@@ -46,27 +46,30 @@ const parse = (nodes, opts) => {
     } else if (node.type === 'function' && node.value === '@') {
       queries[queries.length] = {
         media: '(',
-        value: ''
+        value: '',
       };
       queries[queries.length - 1].media = '(';
       for (const item of node.nodes) {
         if (item.type === 'function') {
           queries[queries.length - 1].media += valueParser.stringify(item);
         } else {
-          queries[queries.length - 1].media += ((item.before || '') + item.value + (item.after || ''));
+          queries[queries.length - 1].media +=
+            (item.before || '') + item.value + (item.after || '');
         }
       }
       queries[queries.length - 1].media += ')';
     } else if (node.type === 'word' && /^@/gi.test(node.value)) {
       queries[queries.length] = {
         media: '(',
-        value: ''
+        value: '',
       };
       let media = node.value.replace(/^@/gi, '');
       if (Number.isNaN(parseInt(media, 10))) {
         media = `$${media}`;
       } else {
-        media = `(${opts.shorthand}: ${media}${opts.shorthandUnit})`;
+        media = `(${opts.shorthand}: ${
+          parseInt(media, 10) + opts.shorthandValueAddition
+        }${opts.shorthandUnit})`;
       }
       queries[queries.length - 1].media = media;
     } else if (queries.length > 0) {
@@ -83,7 +86,8 @@ const parse = (nodes, opts) => {
       if (['word', 'space'].indexOf(node.type) !== -1) {
         base += getValue(node);
       } else if (
-        node.type === 'function' && ['', '@'].indexOf(node.value) === -1
+        node.type === 'function' &&
+        ['', '@'].indexOf(node.value) === -1
       ) {
         base += getValue(node);
       }
@@ -99,9 +103,9 @@ const parse = (nodes, opts) => {
     queries: queries.map(({ media, value }) => {
       return {
         media,
-        value: cleanString(value)
+        value: cleanString(value),
       };
-    })
+    }),
   };
 };
 
@@ -119,10 +123,11 @@ class Query {
     this.source = source;
 
     const queries = content.queries.map(({ media, value }) => {
-      const special = media.indexOf(':') !== -1
-        || media.indexOf('--') !== -1
-        || media.indexOf('>') !== -1
-        || media.indexOf('<') !== -1;
+      const special =
+        media.indexOf(':') !== -1 ||
+        media.indexOf('--') !== -1 ||
+        media.indexOf('>') !== -1 ||
+        media.indexOf('<') !== -1;
       const parenthesis = media.replace(/^\(/gi, '').indexOf('(') !== -1;
       if ((special && parenthesis) || (!special && !parenthesis)) {
         media = media.replace(/^\(/gi, '').replace(/\)$/gi, '');
@@ -131,13 +136,13 @@ class Query {
 
       return {
         media,
-        value: cleanString(value)
+        value: cleanString(value),
       };
     });
 
     this.content = {
       base: content.base,
-      queries
+      queries,
     };
   }
 }
@@ -159,12 +164,12 @@ class RulePack {
     this.rules.push(rule);
     content.queries.forEach(({ media, value }) => {
       let foundMedia = false;
-      this.queries.forEach(item => {
+      this.queries.forEach((item) => {
         if (item.media === media && !foundMedia) {
           foundMedia = true;
           item.queries.push({
             prop,
-            value
+            value,
           });
         }
       });
@@ -174,9 +179,9 @@ class RulePack {
           queries: [
             {
               prop,
-              value
-            }
-          ]
+              value,
+            },
+          ],
         });
       }
     });
@@ -184,18 +189,23 @@ class RulePack {
 }
 
 module.exports = postcss.plugin('postcss-inline-media', (opts = {}) => {
-  return root => {
+  return (root) => {
     const mediaQueries = [];
 
-    root.walk(rule => {
+    root.walk((rule) => {
       if (rule.type !== 'decl') return;
       const value = rule.value;
       if (/@/gi.test(value)) {
         const content = parse(valueParser(value).nodes, {
-          shorthand: typeof opts.shorthand === 'string'
-            ? opts.shorthand : 'max-width',
-          shorthandUnit: typeof opts.shorthandUnit === 'string'
-            ? opts.shorthandUnit : 'px'
+          shorthand:
+            typeof opts.shorthand === 'string' ? opts.shorthand : 'max-width',
+          shorthandUnit:
+            typeof opts.shorthandUnit === 'string' ? opts.shorthandUnit : 'px',
+          shorthandValueAddition:
+            typeof opts.shorthandValueAddition === 'number' &&
+            !isNaN(opts.shorthandValueAddition)
+              ? opts.shorthandValueAddition
+              : 0,
         });
 
         const query = new Query(
@@ -205,9 +215,9 @@ module.exports = postcss.plugin('postcss-inline-media', (opts = {}) => {
           content
         );
         if (
-          mediaQueries.length
-          && mediaQueries[mediaQueries.length - 1].parent === rule.parent
-          && mediaQueries[mediaQueries.length - 1].selector === query.selector
+          mediaQueries.length &&
+          mediaQueries[mediaQueries.length - 1].parent === rule.parent &&
+          mediaQueries[mediaQueries.length - 1].selector === query.selector
         ) {
           mediaQueries[mediaQueries.length - 1].addQuery(rule, query);
         } else {
@@ -219,28 +229,28 @@ module.exports = postcss.plugin('postcss-inline-media', (opts = {}) => {
         if (content.base !== '') {
           rule.parent.insertBefore(rule, {
             prop: rule.prop,
-            value: content.base
+            value: content.base,
           });
         }
       }
     });
 
-    mediaQueries.forEach(mq => {
+    mediaQueries.forEach((mq) => {
       const nodeRoot = mq.parent.parent;
 
       mq.queries.forEach(({ media, queries, source }) => {
         const atRule = postcss.atRule({
           name: 'media',
-          params: media
+          params: media,
         });
 
         const mediaRule = postcss.rule({
-          selector: mq.selector
+          selector: mq.selector,
         });
         queries.forEach(({ prop, value }) => {
           mediaRule.append({
             prop,
-            value
+            value,
           });
         });
         atRule.append(mediaRule);
@@ -249,7 +259,7 @@ module.exports = postcss.plugin('postcss-inline-media', (opts = {}) => {
         nodeRoot.append(atRule);
       });
 
-      mq.rules.forEach(rule => {
+      mq.rules.forEach((rule) => {
         rule.remove();
       });
     });

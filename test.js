@@ -10,14 +10,14 @@ import postcssInlineMedia from '.';
 
 const tester = new PostcssTester({
   postcss,
-  plugin: postcssInlineMedia
+  plugin: postcssInlineMedia,
 });
 
-test('@(max-width: 800px)', async t => {
-  const input = /* scss */`
+test('@(max-width: 800px)', async (t) => {
+  const input = /* scss */ `
     div { margin: 20px @(max-width: 800px) 10px; }
   `;
-  const output = /* scss */`
+  const output = /* scss */ `
     div { margin: 20px; }
     @media (max-width: 800px) {
       div { margin: 10px; }
@@ -26,11 +26,11 @@ test('@(max-width: 800px)', async t => {
   tester.test(input, output, t);
 });
 
-test('no default value', async t => {
-  const input = /* scss */`
+test('no default value', async (t) => {
+  const input = /* scss */ `
     div { margin: @(max-width: 800px) 10px; }
   `;
-  const output = /* scss */`
+  const output = /* scss */ `
     div { }
     @media (max-width: 800px) {
       div { margin: 10px }
@@ -39,11 +39,11 @@ test('no default value', async t => {
   tester.test(input, output, t);
 });
 
-test('or operator replacement', async t => {
-  const input = /* scss */`
+test('or operator replacement', async (t) => {
+  const input = /* scss */ `
     div { margin: 20px @(print or tv) 10px; }
   `;
-  const output = /* scss */`
+  const output = /* scss */ `
     div { margin: 20px; }
     @media print,tv {
       div { margin: 10px; }
@@ -52,11 +52,11 @@ test('or operator replacement', async t => {
   tester.test(input, output, t);
 });
 
-test('@Number shorthand', async t => {
-  const input = /* scss */`
+test('@Number shorthand', async (t) => {
+  const input = /* scss */ `
     div { margin: 20px @800 10px; }
   `;
-  const output = /* scss */`
+  const output = /* scss */ `
     div { margin: 20px; }
     @media (max-width: 800px) {
       div { margin: 10px; }
@@ -65,11 +65,11 @@ test('@Number shorthand', async t => {
   tester.test(input, output, t);
 });
 
-test('Custom shorthand option', async t => {
-  const input = /* scss */`
+test('Custom shorthand option', async (t) => {
+  const input = /* scss */ `
     div { margin: 20px @800 10px; }
   `;
-  const output = /* scss */`
+  const output = /* scss */ `
     div { margin: 20px; }
     @media (min-width: 800px) {
       div { margin: 10px; }
@@ -77,16 +77,16 @@ test('Custom shorthand option', async t => {
   `;
   tester.test(input, output, t, {
     pluginOptions: {
-      shorthand: 'min-width'
-    }
+      shorthand: 'min-width',
+    },
   });
 });
 
-test('Custom shorthandUnit option', async t => {
-  const input = /* scss */`
+test('Custom shorthandUnit option', async (t) => {
+  const input = /* scss */ `
     div { margin: 20px @30 10px; }
   `;
-  const output = /* scss */`
+  const output = /* scss */ `
     div { margin: 20px; }
     @media (max-width: 30em) {
       div { margin: 10px; }
@@ -94,16 +94,33 @@ test('Custom shorthandUnit option', async t => {
   `;
   tester.test(input, output, t, {
     pluginOptions: {
-      shorthandUnit: 'em'
-    }
+      shorthandUnit: 'em',
+    },
   });
 });
 
-test('multiples conditions', async t => {
-  const input = /* scss */`
+test('Custom shorthandValueAddition option', async (t) => {
+  const input = /* scss */ `
+    div { margin: 20px @30 10px; }
+  `;
+  const output = /* scss */ `
+    div { margin: 20px; }
+    @media (max-width: 29px) {
+      div { margin: 10px; }
+    }
+  `;
+  tester.test(input, output, t, {
+    pluginOptions: {
+      shorthandValueAddition: -1,
+    },
+  });
+});
+
+test('multiples conditions', async (t) => {
+  const input = /* scss */ `
     div { margin: 20px @800 10px @600 5px; }
   `;
-  const output = /* scss */`
+  const output = /* scss */ `
     div { margin: 20px; }
     @media (max-width: 800px) {
       div { margin: 10px; }
@@ -115,27 +132,27 @@ test('multiples conditions', async t => {
   tester.test(input, output, t);
 });
 
-test('postcss-simple-vars', async t => {
-  const input = /* scss */`
+test('postcss-simple-vars', async (t) => {
+  const input = /* scss */ `
     $media: (print);
     div { margin: 20px @media 10px; }
   `;
-  const output = /* scss */`
+  const output = /* scss */ `
     div { margin: 20px; }
     @media (print) {
       div { margin: 10px; }
     }
   `;
   tester.test(input, output, t, {
-    pluginsAfter: [postcssSimpleVars()]
+    pluginsAfter: [postcssSimpleVars()],
   });
 });
 
-test('simple nested condition', async t => {
-  const input = /* scss */`
+test('simple nested condition', async (t) => {
+  const input = /* scss */ `
     div { margin: 20px (15px @800 10px); }
   `;
-  const output = /* scss */`
+  const output = /* scss */ `
     div { margin: 20px 15px; }
     @media (max-width: 800px) {
       div { margin: 20px 10px; }
@@ -144,13 +161,13 @@ test('simple nested condition', async t => {
   tester.test(input, output, t);
 });
 
-test('complex nested condition', async t => {
-  const input = /* scss */`
+test('complex nested condition', async (t) => {
+  const input = /* scss */ `
     div {
       margin: 20px (15px @(print) 10px @(max-width: 800px) 7px) 5px 5px;
     }
   `;
-  const output = /* scss */`
+  const output = /* scss */ `
     div { margin: 20px 15px 5px 5px; }
     @media print {
       div { margin: 20px 10px 5px 5px; }
@@ -162,11 +179,11 @@ test('complex nested condition', async t => {
   tester.test(input, output, t);
 });
 
-test('complex nested condition with function node', async t => {
-  const input = /* scss */`
+test('complex nested condition with function node', async (t) => {
+  const input = /* scss */ `
     div { margin: 20px (15px @(print) 10px) 7px func(8px); }
   `;
-  const output = /* scss */`
+  const output = /* scss */ `
     div { margin: 20px 15px 7px func(8px); }
     @media print {
       div { margin: 20px 10px 7px func(8px); }
@@ -175,58 +192,58 @@ test('complex nested condition with function node', async t => {
   tester.test(input, output, t);
 });
 
-test('postcss-custom-media', async t => {
-  const input = /* scss */`
+test('postcss-custom-media', async (t) => {
+  const input = /* scss */ `
     @custom-media --small-viewport (max-width: 30em);
     div {
       margin: 20px @(--small-viewport) 10px;
     }
   `;
-  const output = /* scss */`
+  const output = /* scss */ `
     div { margin: 20px; }
     @media (max-width: 30em) {
       div { margin: 10px; }
     }
   `;
   tester.test(input, output, t, {
-    pluginsAfter: [postcssCustomMedia()]
+    pluginsAfter: [postcssCustomMedia()],
   });
 });
 
-test('postcss-media-minmax', async t => {
-  const input = /* scss */`
+test('postcss-media-minmax', async (t) => {
+  const input = /* scss */ `
     div { margin: 20px @(width >= 500px) 10px; }
   `;
-  const output = /* scss */`
+  const output = /* scss */ `
     div { margin: 20px; }
     @media (min-width: 500px) {
       div { margin: 10px; }
     }
   `;
   tester.test(input, output, t, {
-    pluginsAfter: [postcssMediaMinMax()]
+    pluginsAfter: [postcssMediaMinMax()],
   });
 });
 
-test('postcss-media-minmax many', async t => {
-  const input = /* scss */`
+test('postcss-media-minmax many', async (t) => {
+  const input = /* scss */ `
     div {
       margin: 20px @(screen and (width >= 500px) and (width <= 1200px)) 10px;
     }
   `;
-  const output = /* scss */`
+  const output = /* scss */ `
     div { margin: 20px; }
     @media screen and (min-width: 500px) and (max-width: 1200px) {
       div { margin: 10px; }
     }
   `;
   tester.test(input, output, t, {
-    pluginsAfter: [postcssMediaMinMax()]
+    pluginsAfter: [postcssMediaMinMax()],
   });
 });
 
-test('nested rules', async t => {
-  const input = /* scss */`
+test('nested rules', async (t) => {
+  const input = /* scss */ `
     div {
       margin: 20px @900 10px @600 5px;
       padding: 20px @900 10px;
@@ -236,7 +253,7 @@ test('nested rules', async t => {
     }
     span { color: black @800 red; }
   `;
-  const output = /* scss */`
+  const output = /* scss */ `
     div {
       margin: 20px;
       padding: 20px;
@@ -264,8 +281,8 @@ test('nested rules', async t => {
   tester.test(input, output, t);
 });
 
-test('nested pseudo element', async t => {
-  const input = /* scss */`
+test('nested pseudo element', async (t) => {
+  const input = /* scss */ `
     div {
       margin: 20px @900 10px;
       padding: @600 10px;
@@ -274,7 +291,7 @@ test('nested pseudo element', async t => {
       }
     }
   `;
-  const output = /* scss */`
+  const output = /* scss */ `
     div {
       margin: 20px;
       &::before {
@@ -296,8 +313,8 @@ test('nested pseudo element', async t => {
   tester.test(input, output, t);
 });
 
-test('nested unknown rule type', async t => {
-  const input = /* scss */`
+test('nested unknown rule type', async (t) => {
+  const input = /* scss */ `
     div {
       margin: 20px @900 10px;
       -something {
@@ -305,7 +322,7 @@ test('nested unknown rule type', async t => {
       }
     }
   `;
-  const output = /* scss */`
+  const output = /* scss */ `
     div {
       margin: 20px;
       -something {

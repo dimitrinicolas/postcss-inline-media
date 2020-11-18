@@ -12,27 +12,44 @@ on the same line.
 ## Installation
 
 ```console
-$ npm install postcss-inline-media
+npm install postcss-inline-media
 ```
 
 ## Usage
 
 ```js
 // PostCSS plugins
-postcss([ require('postcss-inline-media') ])
+postcss([
+  require('postcss-inline-media'),
+]);
 ```
 
 Check out [PostCSS][postcss] docs for the complete installation.
 
 ### Example
 
-You can inline media queries just by writing its condition next to an `@` 
+You can inline media queries just by writing its condition next to an `@`
 symbol.
 
-If you only write a number after the `@`, it will be read as a `max-width` 
-value in pixels, you can change this shorthand with the `shorthand` and 
-'shorthandUnit' option of this plugin, eg: 
-`require('postcss-inline-media')({ shorthand: 'min-width' })`.
+If you only write a number after the `@`, it will be read as a `max-width`
+value in pixels, you can change this shorthand with the `shorthand` and
+`shorthandUnit` option of this plugin, e.g.:
+
+```js
+require('postcss-inline-media')({
+  shorthand: 'min-width',
+  shorthandUnit: 'rem',
+})
+```
+
+You can use the `shorthandValueAddition` to modify the shorthand media queries
+number values with a relative number to addition to it, e.g.:
+
+```js
+require('postcss-inline-media')({
+  shorthandValueAddition: -1',
+})
+```
 
 This file:
 
@@ -63,7 +80,7 @@ will output:
 ### Media queries variables
 
 You can use
-[**postcss-simple-vars**][postcss-simple-vars] as media queries shortcut, put 
+[**postcss-simple-vars**][postcss-simple-vars] as media queries shortcut, put
 the `postcss-simple-vars` plugin **after** `postcss-inline-media`.
 
 ```pcss
@@ -88,7 +105,7 @@ will output:
 
 ### Nested conditions
 
-You can nest media queries in parentheses, but you can't set multiples nesting 
+You can nest media queries in parentheses, but you can't set multiples nesting
 parentheses on the same CSS property.
 
 ```pcss
@@ -118,8 +135,8 @@ div {
 ### postcss-media-minmax
 
 This plugin is compatible with 
-[**postcss-media-minmax**][postcss-media-minmax], put the 
-`postcss-media-minmax` plugin **after** `postcss-inline-media`.
+[**postcss-media-minmax**][postcss-media-minmax], put the `postcss-media-minmax`
+plugin **after** `postcss-inline-media`.
 
 ```pcss
 .btn {
@@ -130,8 +147,8 @@ This plugin is compatible with
 ### postcss-custom-media
 
 You can also use
-[**postcss-custom-media**][postcss-custom-media], put the 
-`postcss-custom-media` plugin **after** `postcss-inline-media`.
+[**postcss-custom-media**][postcss-custom-media], put the `postcss-custom-media`
+plugin **after** `postcss-inline-media`.
 
 ```pcss
 @custom-media --small-viewport (max-width: 30em);
@@ -143,12 +160,12 @@ You can also use
 ## Related
 
 - [postcss][postcss] - Transforming styles with JS plugins
-- [postcss-simple-vars][postcss-simple-vars] - PostCSS plugin for Sass-like 
+- [postcss-simple-vars][postcss-simple-vars] - PostCSS plugin for Sass-like
 variables
-- [postcss-media-minmax][postcss-media-minmax] - Writing simple and graceful 
+- [postcss-media-minmax][postcss-media-minmax] - Writing simple and graceful
 Media Queries!
-- [postcss-custom-media][postcss-custom-media] - PostCSS plugin to transform 
-- [ava-postcss-tester][ava-postcss-tester] - Simply test your PostCSS plugin 
+- [postcss-custom-media][postcss-custom-media] - PostCSS plugin to transform
+- [ava-postcss-tester][ava-postcss-tester] - Simply test your PostCSS plugin
 with AVA
 
 ## License
