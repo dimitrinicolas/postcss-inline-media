@@ -47,7 +47,7 @@ number values with a relative number to addition to it, e.g.:
 
 ```js
 require('postcss-inline-media')({
-  shorthandValueAddition: -1',
+  shorthandValueAddition: -1,
 })
 ```
 
