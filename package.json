@@ -34,8 +34,10 @@
     "dev": "nodemon -e js -x \"npm run test\""
   },
   "dependencies": {
-    "postcss": "^7.0.2",
-    "postcss-value-parser": "^3.3.0"
+    "postcss-value-parser": "^4.2.0"
+  },
+  "peerDependencies": {
+    "postcss": "^8.3.3"
   },
   "devDependencies": {
     "ava": "^0.25.0",
