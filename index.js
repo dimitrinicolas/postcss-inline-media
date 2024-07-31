@@ -189,7 +189,7 @@ class RulePack {
 }
 
 module.exports = (opts = {}) => {
-  const inlineMedia = root => {
+  const inlineMedia = (root) => {
     const mediaQueries = [];
 
     root.walk((rule) => {
@@ -212,7 +212,7 @@ module.exports = (opts = {}) => {
           rule.parent.selector,
           rule.prop,
           rule.source,
-          content
+          content,
         );
         if (
           mediaQueries.length &&
@@ -264,10 +264,10 @@ module.exports = (opts = {}) => {
       });
     });
   };
-  
+
   return {
     postcssPlugin: 'postcss-inline-media',
-    Once: inlineMedia
+    Once: inlineMedia,
   };
 };
 

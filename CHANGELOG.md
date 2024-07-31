@@ -3,6 +3,10 @@
 This project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.5.0 - 2024-07-31
+### Added
+- PostCSS 8 support, thanks to @stephanedemotte [issue #11](https://github.com/dimitrinicolas/postcss-inline-media/issues/8) and [pr #12](https://github.com/dimitrinicolas/postcss-inline-media/pull/12).
+
 ## 1.4.0 - 2020-11-18
 ### Added
 - The `shorthandValueAddition` option, regarding [issue #3](https://github.com/dimitrinicolas/postcss-inline-media/issues/3).

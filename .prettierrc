@@ -1,0 +1,5 @@
+{
+  "singleQuote": true,
+  "semi": true,
+  "importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"]
+}

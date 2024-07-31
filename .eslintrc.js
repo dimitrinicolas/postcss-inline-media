@@ -1,18 +1,22 @@
 module.exports = {
   env: {
-    browser: true
+    browser: true,
   },
   extends: 'airbnb',
   parser: 'babel-eslint',
-  rules : {
-    'max-len': ['error', {
-      'code': 150
-    }],
+  rules: {
+    'max-len': [
+      'error',
+      {
+        code: 150,
+      },
+    ],
     'comma-dangle': 0,
     'no-plusplus': 0,
-    'arrow-parens': ['error', 'as-needed'],
+    'arrow-parens': 0,
     'no-multi-assign': 0,
-    'strict': 0,
+    strict: 0,
+    'operator-linebreak': 0,
     'no-console': 0,
     'prefer-destructuring': 0,
     'function-paren-newline': 0,
@@ -29,6 +33,6 @@ module.exports = {
     'import/no-unresolved': 0,
     'import/no-dynamic-require': 0,
     'import/no-extraneous-dependencies': 0,
-    'import/extensions': ['warn', 'ignorePackages']
-  }
+    'import/extensions': ['warn', 'ignorePackages'],
+  },
 };
